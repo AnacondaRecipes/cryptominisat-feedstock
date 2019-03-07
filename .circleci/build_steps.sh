@@ -19,11 +19,7 @@ conda-build:
 
 CONDARC
 
-<<<<<<< HEAD
-conda install --yes --quiet conda-forge::conda-forge-ci-setup=2 conda-build
-=======
 conda install --yes --quiet conda-forge-ci-setup=2 conda-build -c conda-forge
->>>>>>> cf/master
 
 # set up the condarc
 setup_conda_rc "${FEEDSTOCK_ROOT}" "${RECIPE_ROOT}" "${CONFIG_FILE}"
@@ -37,16 +33,10 @@ source run_conda_forge_build_setup
 make_build_number "${FEEDSTOCK_ROOT}" "${RECIPE_ROOT}" "${CONFIG_FILE}"
 
 conda build "${RECIPE_ROOT}" -m "${CI_SUPPORT}/${CONFIG}.yaml" \
-<<<<<<< HEAD
-    --clobber-file "${CI_SUPPORT}/clobber_${CONFIG}.yaml"  --quiet
-
-upload_package "${FEEDSTOCK_ROOT}" "${RECIPE_ROOT}" "${CONFIG_FILE}"
-=======
     --clobber-file "${CI_SUPPORT}/clobber_${CONFIG}.yaml"
 
 
 upload_package "${FEEDSTOCK_ROOT}" "${RECIPE_ROOT}" "${CONFIG_FILE}"
 
->>>>>>> cf/master
 
 touch "/home/conda/feedstock_root/build_artifacts/conda-forge-build-done-${CONFIG}"
