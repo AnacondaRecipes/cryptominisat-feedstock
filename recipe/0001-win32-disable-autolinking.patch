@@ -1,0 +1,13 @@
+--- CMakeLists.txt
++++ CMakeLists.txt
+@@ -399,6 +399,10 @@
+     set (boost_components "")
+     set(boost_components ${boost_components} program_options)
+     find_package( Boost 1.46 COMPONENTS ${boost_components})
++    if (WIN32 AND NOT STATICCOMPILE)
++        add_definitions(-DBOOST_ALL_NO_LIB)
++        add_definitions(-DBOOST_ALL_DYN_LINK)
++    endif()
+ endif()
+ 
+ option(STATS "Don't use statistics at all" OFF)

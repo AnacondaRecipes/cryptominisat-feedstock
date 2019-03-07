@@ -1,44 +1,113 @@
 {% set name = "cryptominisat" %}
-{% set version = "5.6.4" %}
-{% set sha256 = "172ab480e8f6bfc4b92a94b607b7c4764e7ebd305a6d3df0cb687a27ac134c71" %}
+{% set version = "5.6.6" %}
+{% set sha256 = "95fac3df4311d4fb6e2674b1bce3113056795a2eda51cd807f73bcc4f9b1a2d5" %}
+{% set build = 0 %}
 
 package:
-  name: '{{ name|lower }}'
-  version: '{{ version }}'
+  name: cryptominisat-split
+  version: {{ version }}
 
 source:
-  fn: {{ version }}.tar.gz
-  url: https://github.com/msoos/{{ name }}/archive/{{ version }}.tar.gz
+  url: https://github.com/msoos/cryptominisat/archive/{{ version }}.tar.gz
   sha256: {{ sha256 }}
+  patches:
+    - 0001-win32-disable-autolinking.patch
+    - 0001-add-LIBRARY_LIB-path-to-building-py-ext-on-win.patch
+    - 0007-pycryptosat-fix-install-path.patch
 
 build:
-  number: 0
-  run_exports:
-   - {{ pin_compatible('cryptominisat', max_pin='x.x') }}
+  number: {{ build }}
+  skip: True  # [win and vc<14]
 
+# HACK: there's an issue with conda-build looping over python versions.  Forcing this here gives
+#    us a clean slate for each build.
 requirements:
-  build:
-    - {{ compiler('cxx') }}  # [not win]
-    - m2-filesystem
-    - m2-coreutils
-    - m2-make
-    - m2w64-toolchain        # [win]
-    - cmake                  # [not win]
   host:
     - python
-    - setuptools
-    - libboost
-    - cmake                  # [win]
   run:
     - python
-    - m2w64-gcc-libs         # [win]
 
-test:
-  imports:
-    - pycryptosat
-  commands:
-    - echo -e '1 0\n-1 0' | cryptominisat5 | grep UNSATISFIABLE
-    - echo -e '1 0\n1 -1 0' | cryptominisat5 | grep SATISFIABLE
+outputs:
+  - name: libcryptominisat
+    build:
+      skip: True  # [win and vc<14]
+      run_exports:
+        - {{ pin_subpackage("libcryptominisat", max_pin="x.x") }}
+    script: install-lib.sh  # [unix]
+    script: install-lib.bat  # [win]
+    requirements:
+      build:
+        - {{ compiler("cxx") }}
+        - cmake
+        - make  # [unix]
+      host:
+        - zlib
+    test:
+      commands:
+        - test -e $PREFIX/lib/libcryptominisat5.5.6.dylib    # [osx]
+        - test -e $PREFIX/lib/libcryptominisat5.so.5.6       # [linux]
+        - IF NOT EXIST %LIBRARY_BIN%\cryptominisat5win.dll exit 1       # [win]
+        - cryptominisat5_simple --zero-exit-status <unsat.cnf
+        - cryptominisat5_simple --zero-exit-status <sat.cnf
+        - cryptominisat5_simple <unsat.cnf | grep UNSATISFIABLE  # [unix]
+        - cryptominisat5_simple <sat.cnf   | grep SATISFIABLE    # [unix]
+        - cryptominisat5_simple <unsat.cnf | findstr UNSATISFIABLE  # [win]
+        - cryptominisat5_simple <sat.cnf   | findstr SATISFIABLE    # [win]
+      files:
+        - sat.cnf
+        - unsat.cnf
+  - name: pycryptosat
+    build:
+      number: {{ build }}
+      skip: True  # [win and vc<14]
+    script: install-py.sh   # [unix]
+    script: install-py.bat  # [win]
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake >=3.12
+        - make  # [unix]
+      host:
+        - python
+        - setuptools
+        - {{ pin_subpackage('libcryptominisat', exact=True) }}
+        - zlib
+      run:
+        - python
+        - {{ pin_subpackage('libcryptominisat', exact=True) }}
+    test:
+      imports:
+        - pycryptosat
+      commands:
+        - python test-pycryptosat.py
+      files:
+        - test-pycryptosat.py
+  - name: cryptominisat
+    script: install-exec.sh   # [unix]
+    script: install-exec.bat  # [win]
+    requirements:
+      build:
+        - {{ compiler('cxx') }}
+        - cmake
+        - make  # [unix]
+      host:
+        - libboost {{ boost }}
+        - {{ pin_subpackage('libcryptominisat', exact=True) }}
+        - zlib
+      run:
+        - {{ pin_compatible("libboost", max_pin="x.x.x") }}
+        - {{ pin_subpackage('libcryptominisat', exact=True) }}
+    test:
+      commands:
+        - cryptominisat5 --zero-exit-status <unsat.cnf
+        - cryptominisat5 --zero-exit-status <sat.cnf
+        - cryptominisat5 <unsat.cnf | grep UNSATISFIABLE  # [unix]
+        - cryptominisat5 <sat.cnf   | grep SATISFIABLE    # [unix]
+        - cryptominisat5 <unsat.cnf | findstr UNSATISFIABLE  # [win]
+        - cryptominisat5 <sat.cnf   | findstr SATISFIABLE    # [win]
+      files:
+        - sat.cnf
+        - unsat.cnf
 
 about:
   home: https://github.com/msoos/cryptominisat
@@ -52,5 +121,6 @@ about:
 extra:
   recipe-maintainers:
     - gshiba
+    - msarahan
     - msoos
     - saraedum
