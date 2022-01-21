@@ -3,6 +3,8 @@ mkdir build_exec && pushd build_exec
 cmake ^
     -G "%CMAKE_GENERATOR%" ^
     -DCMAKE_INSTALL_PREFIX="%LIBRARY_PREFIX%" ^
+    -DCMAKE_INSTALL_LIBDIR="lib" ^
+    -DCMAKE_PREFIX_PATH="%LIBRARY_PREFIX%" ^
     -DENABLE_TESTING=OFF ^
     -DMIT=ON ^
     -DENABLE_PYTHON_INTERFACE=OFF ^
