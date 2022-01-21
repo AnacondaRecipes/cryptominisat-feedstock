@@ -22,6 +22,9 @@ build:
 # HACK: there's an issue with conda-build looping over python versions.  Forcing this here gives
 #    us a clean slate for each build.
 requirements:
+  build:
+    - patch     # [not win]
+    - m2-patch  # [win]
   host:
     - python
   run:
