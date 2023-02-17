@@ -34,8 +34,6 @@ outputs:
   - name: libcryptominisat
     build:
       skip: True  # [win and vc<14]
-      ignore_run_exports:
-        - zlib
       run_exports:
         - {{ pin_subpackage("libcryptominisat", max_pin="x.x") }}
     script: install-lib.sh  # [unix]
@@ -67,8 +65,6 @@ outputs:
     build:
       number: {{ build }}
       skip: True  # [win and vc<14]
-      ignore_run_exports:
-        - zlib
     script: install-py.sh   # [unix]
     script: install-py.bat  # [win]
     requirements:
