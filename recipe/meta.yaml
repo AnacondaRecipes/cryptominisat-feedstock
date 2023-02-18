@@ -1,7 +1,7 @@
 {% set name = "cryptominisat" %}
 {% set version = "5.6.6" %}
 {% set sha256 = "95fac3df4311d4fb6e2674b1bce3113056795a2eda51cd807f73bcc4f9b1a2d5" %}
-{% set build = 0 %}
+{% set build = 1 %}
 
 package:
   name: cryptominisat-split
@@ -34,8 +34,6 @@ outputs:
   - name: libcryptominisat
     build:
       skip: True  # [win and vc<14]
-      ignore_run_exports:
-        - zlib
       run_exports:
         - {{ pin_subpackage("libcryptominisat", max_pin="x.x") }}
     script: install-lib.sh  # [unix]
@@ -67,8 +65,6 @@ outputs:
     build:
       number: {{ build }}
       skip: True  # [win and vc<14]
-      ignore_run_exports:
-        - zlib
     script: install-py.sh   # [unix]
     script: install-py.bat  # [win]
     requirements:
@@ -78,7 +74,9 @@ outputs:
         - make  # [unix]
       host:
         - python
-        - setuptools
+        - setuptools <60
+        - wheel
+        - pip
         - {{ pin_subpackage('libcryptominisat', exact=True) }}
         - zlib
       run:
