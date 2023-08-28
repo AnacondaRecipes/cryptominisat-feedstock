@@ -98,7 +98,7 @@ outputs:
         - cmake
         - make  # [unix]
       host:
-        - libboost {{ boost }}
+        - libboost 1.82
         - {{ pin_subpackage('libcryptominisat', exact=True) }}
         - zlib
       run:
