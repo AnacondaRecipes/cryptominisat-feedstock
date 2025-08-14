@@ -1,6 +1,6 @@
 {% set name = "cryptominisat" %}
 {% set version = "5.6.6" %}
-{% set build = 3 %}
+{% set build = 4 %}
 
 package:
   name: cryptominisat-split
@@ -98,7 +98,7 @@ outputs:
         - cmake
         - make  # [unix]
       host:
-        - libboost 1.82
+        - libboost-devel 1.88.0
         - {{ pin_subpackage('libcryptominisat', exact=True) }}
         - zlib
       run:
