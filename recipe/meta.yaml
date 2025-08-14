@@ -73,7 +73,7 @@ outputs:
         - make  # [unix]
       host:
         - python
-        - setuptools
+        - setuptools >=68.0.0
         - wheel
         - pip
         - {{ pin_subpackage('libcryptominisat', exact=True) }}
