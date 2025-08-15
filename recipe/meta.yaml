@@ -14,6 +14,7 @@ source:
     - patches/0002-pycryptosat-fix-install-path.patch
     - patches/0003-replace-distutils.patch
     - patches/0004-remove-deprecated-license-format.patch
+    - patches/0005-dont-override-sysconfig.patch
 
 
 build:
@@ -23,9 +24,6 @@ build:
 # HACK: there's an issue with conda-build looping over python versions.  Forcing this here gives
 #    us a clean slate for each build.
 requirements:
-  build:
-    - patch     # [not win]
-    - m2-patch  # [win]
   host:
     - python
   run:
@@ -41,6 +39,7 @@ outputs:
     script: install-lib.bat  # [win]
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler("cxx") }}
         - cmake
         - make  # [unix]
@@ -70,6 +69,7 @@ outputs:
     script: install-py.bat  # [win]
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('cxx') }}
         - cmake >=3.12
         - make  # [unix]
@@ -96,6 +96,7 @@ outputs:
     script: install-exec.bat  # [win]
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('cxx') }}
         - cmake
         - make  # [unix]
