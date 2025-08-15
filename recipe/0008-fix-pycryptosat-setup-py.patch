@@ -1,0 +1,11 @@
+--- pycryptosat/setup.py
++++ pycryptosat/setup.py
+@@ -26,7 +26,10 @@
+ import sys
+ import os
+ import platform
+-from distutils.core import setup, Extension
++try:
++    from setuptools import setup, Extension
++except ImportError:
++    from distutils.core import setup, Extension

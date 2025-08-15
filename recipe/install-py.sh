@@ -1,8 +1,5 @@
 mkdir -p build_py && pushd build_py
 
-# Set environment variables to work around distutils issues
-export SETUPTOOLS_USE_DISTUTILS=stdlib
-
 cmake \
     -G "${CMAKE_GENERATOR}" \
     -DCMAKE_INSTALL_PREFIX="${PREFIX}" \

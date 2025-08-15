@@ -13,6 +13,7 @@ source:
     # - 0001-win32-disable-autolinking.patch
     - 0001-add-LIBRARY_LIB-path-to-building-py-ext-on-win.patch
     - 0007-pycryptosat-fix-install-path.patch
+    - 0008-fix-pycryptosat-setup-py.patch
 
 build:
   number: {{ build }}
