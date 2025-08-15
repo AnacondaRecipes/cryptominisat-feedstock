@@ -10,10 +10,10 @@ source:
   url: https://github.com/msoos/cryptominisat/archive/{{ version }}.tar.gz
   sha256: 95fac3df4311d4fb6e2674b1bce3113056795a2eda51cd807f73bcc4f9b1a2d5
   patches:
-    # - 0001-win32-disable-autolinking.patch
-    - 0001-add-LIBRARY_LIB-path-to-building-py-ext-on-win.patch
-    - 0007-pycryptosat-fix-install-path.patch
-    - 0008-fix-pycryptosat-setup-py.patch
+    - patches/0001-add-LIBRARY_LIB-path-to-building-py-ext-on-win.patch
+    - patches/0002-pycryptosat-fix-install-path.patch
+    - patches/0003-replace-distutils.patch
+
 
 build:
   number: {{ build }}
@@ -74,7 +74,7 @@ outputs:
         - make  # [unix]
       host:
         - python
-        - setuptools >=68.0.0
+        - setuptools
         - wheel
         - pip
         - {{ pin_subpackage('libcryptominisat', exact=True) }}
