@@ -13,6 +13,7 @@ source:
     - patches/0001-add-LIBRARY_LIB-path-to-building-py-ext-on-win.patch
     - patches/0002-pycryptosat-fix-install-path.patch
     - patches/0003-replace-distutils.patch
+    - patches/0004-remove-deprecated-license-format.patch
 
 
 build:
