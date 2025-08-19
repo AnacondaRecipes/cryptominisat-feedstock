@@ -1,6 +1,6 @@
 {% set name = "cryptominisat" %}
 {% set version = "5.6.6" %}
-{% set build = 3 %}
+{% set build = 4 %}
 
 package:
   name: cryptominisat-split
@@ -10,9 +10,12 @@ source:
   url: https://github.com/msoos/cryptominisat/archive/{{ version }}.tar.gz
   sha256: 95fac3df4311d4fb6e2674b1bce3113056795a2eda51cd807f73bcc4f9b1a2d5
   patches:
-    # - 0001-win32-disable-autolinking.patch
-    - 0001-add-LIBRARY_LIB-path-to-building-py-ext-on-win.patch
-    - 0007-pycryptosat-fix-install-path.patch
+    - patches/0001-add-LIBRARY_LIB-path-to-building-py-ext-on-win.patch
+    - patches/0002-pycryptosat-fix-install-path.patch
+    - patches/0003-replace-distutils.patch
+    - patches/0004-remove-deprecated-license-format.patch
+    - patches/0005-dont-override-sysconfig.patch
+
 
 build:
   number: {{ build }}
@@ -21,9 +24,6 @@ build:
 # HACK: there's an issue with conda-build looping over python versions.  Forcing this here gives
 #    us a clean slate for each build.
 requirements:
-  build:
-    - patch     # [not win]
-    - m2-patch  # [win]
   host:
     - python
   run:
@@ -39,6 +39,7 @@ outputs:
     script: install-lib.bat  # [win]
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler("cxx") }}
         - cmake
         - make  # [unix]
@@ -68,12 +69,13 @@ outputs:
     script: install-py.bat  # [win]
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('cxx') }}
         - cmake >=3.12
         - make  # [unix]
       host:
         - python
-        - setuptools <60
+        - setuptools
         - wheel
         - pip
         - {{ pin_subpackage('libcryptominisat', exact=True) }}
@@ -94,11 +96,12 @@ outputs:
     script: install-exec.bat  # [win]
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('cxx') }}
         - cmake
         - make  # [unix]
       host:
-        - libboost 1.82
+        - libboost-devel 1.88.0
         - {{ pin_subpackage('libcryptominisat', exact=True) }}
         - zlib
       run:

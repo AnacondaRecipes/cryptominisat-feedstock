@@ -1,0 +1,29 @@
+From 43182036f2ac1f39b2c32eda69a116787d4617ed Mon Sep 17 00:00:00 2001
+From: Eric Lundby <Eric.Lundby@gmail.com>
+Date: Fri, 15 Aug 2025 14:15:09 -0600
+Subject: [PATCH 3/3] replace-distutils
+
+Remove usage of deprecated distutils.
+
+---
+ python/setup.py.in | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/python/setup.py.in b/python/setup.py.in
+index 61ee25f..32a2185 100644
+--- a/python/setup.py.in
++++ b/python/setup.py.in
+@@ -26,9 +26,8 @@
+ import sys
+ import os
+ import platform
+-from distutils.core import setup, Extension
+-from distutils import sysconfig
+-from distutils.cmd import Command
++from setuptools import setup, Extension, Command
++import sysconfig
+ 
+ __PACKAGE_VERSION__ = "0.2.0"
+ __LIBRARY_VERSION__ = "${CMS_FULL_VERSION}"
+-- 
+2.45.2
