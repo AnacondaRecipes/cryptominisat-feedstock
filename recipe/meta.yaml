@@ -1,25 +1,36 @@
 {% set name = "cryptominisat" %}
-{% set version = "5.6.6" %}
-{% set build = 4 %}
+{% set version = "5.12.1" %}
+{% set build = 0 %}
 
 package:
-  name: cryptominisat-split
+  name: {{ name }}-split
   version: {{ version }}
 
 source:
-  url: https://github.com/msoos/cryptominisat/archive/{{ version }}.tar.gz
-  sha256: 95fac3df4311d4fb6e2674b1bce3113056795a2eda51cd807f73bcc4f9b1a2d5
-  patches:
-    - patches/0001-add-LIBRARY_LIB-path-to-building-py-ext-on-win.patch
-    - patches/0002-pycryptosat-fix-install-path.patch
-    - patches/0003-replace-distutils.patch
-    - patches/0004-remove-deprecated-license-format.patch
-    - patches/0005-dont-override-sysconfig.patch
-
+  - url: https://github.com/msoos/{{ name }}/archive/{{ version }}.tar.gz
+    sha256: fa504ae5846c80a3650fda620383def7f3d1d9d5d08824b57e13c4d41e881d89
+    folder: cryptominisat
+    patches:
+     - patches/fix_source_for_python.patch
+     - patches/fix_tests.patch
+  # We need to use source from git because
+  # https://github.com/arminbiere/cadiback/blob/789329d8fcda851085ed72f1b07d8c3f46243b8a/generate#L7
+  - git_url: https://github.com/meelgroup/cadiback.git
+    git_rev: mate
+    folder: cadiback
+    patches:
+     - patches/fix_cadiback.patch
+  # The reason why cadical should be built from source here:
+  # https://github.com/arminbiere/cadiback/blob/789329d8fcda851085ed72f1b07d8c3f46243b8a/README.md?plain=1#L7
+  - git_url: https://github.com/meelgroup/cadical.git
+    git_rev: mate-only-libraries-1.8.0
+    folder: cadical
 
 build:
-  number: {{ build }}
-  skip: True  # [win and vc<14]
+  number: 0
+  # After adding cadical and caiback as dependency to this package it cannot be build for windows
+  # https://github.com/msoos/cryptominisat/commit/d1a51c9e7a96206bb2ddd07ae524e147b796e4b2
+  skip: True  # [win]
 
 # HACK: there's an issue with conda-build looping over python versions.  Forcing this here gives
 #    us a clean slate for each build.
@@ -32,7 +43,6 @@ requirements:
 outputs:
   - name: libcryptominisat
     build:
-      skip: True  # [win and vc<14]
       run_exports:
         - {{ pin_subpackage("libcryptominisat", max_pin="x.x") }}
     script: install-lib.sh  # [unix]
@@ -45,39 +55,42 @@ outputs:
         - make  # [unix]
       host:
         - zlib
+        - gmp
       run:
         - zlib
     test:
       commands:
-        - test -e $PREFIX/lib/libcryptominisat5.5.6.dylib    # [osx]
-        - test -e $PREFIX/lib/libcryptominisat5.so.5.6       # [linux]
+        - test -e $PREFIX/lib/libcryptominisat5.5.12.dylib    # [osx]
+        - test -e $PREFIX/lib/libcryptominisat5.so.5.12       # [linux]
         - IF NOT EXIST %LIBRARY_BIN%\cryptominisat5win.dll exit 1       # [win]
-        - cryptominisat5_simple --zero-exit-status <unsat.cnf
-        - cryptominisat5_simple --zero-exit-status <sat.cnf
-        - cryptominisat5_simple <unsat.cnf | grep UNSATISFIABLE  # [unix]
-        - cryptominisat5_simple <sat.cnf   | grep SATISFIABLE    # [unix]
-        - cryptominisat5_simple <unsat.cnf | findstr UNSATISFIABLE  # [win]
-        - cryptominisat5_simple <sat.cnf   | findstr SATISFIABLE    # [win]
+        - cryptominisat5 --zero-exit-status <unsat.cnf
+        - cryptominisat5 --zero-exit-status <sat.cnf
+        - cryptominisat5 <unsat.cnf | grep UNSATISFIABLE  # [unix]
+        - cryptominisat5 <sat.cnf   | grep SATISFIABLE    # [unix]
+        - cryptominisat5 <unsat.cnf | findstr UNSATISFIABLE  # [win]
+        - cryptominisat5 <sat.cnf   | findstr SATISFIABLE    # [win]
       files:
         - sat.cnf
         - unsat.cnf
+
   - name: pycryptosat
     build:
       number: {{ build }}
-      skip: True  # [win and vc<14]
-    script: install-py.sh   # [unix]
-    script: install-py.bat  # [win]
+      skip: True  # [py<35]
+      script:
+        - cd cryptominisat && python -m pip install . -vv --no-deps --no-build-isolation
     requirements:
       build:
         - {{ stdlib('c') }}
         - {{ compiler('cxx') }}
-        - cmake >=3.12
-        - make  # [unix]
       host:
         - python
-        - setuptools
+        - setuptools >=42
+        - pathlib
+        - tomli
         - wheel
         - pip
+        - gmp
         - {{ pin_subpackage('libcryptominisat', exact=True) }}
         - zlib
       run:
@@ -88,9 +101,10 @@ outputs:
       imports:
         - pycryptosat
       commands:
-        - python test-pycryptosat.py
-      files:
-        - test-pycryptosat.py
+        - python cryptominisat/python/tests/test_pycryptosat.py
+      source_files:
+        - cryptominisat/python/tests
+
   - name: cryptominisat
     script: install-exec.sh   # [unix]
     script: install-exec.bat  # [win]

@@ -1,0 +1,31 @@
+diff --git a/setup.py b/setup.py
+index d6859b6c5..eacf8a3dd 100644
+--- a/setup.py
++++ b/setup.py
+@@ -56,6 +56,7 @@ def gen_modules(version):
+         extra_compile_args_val = ['-I../', '-Isrc/', '-std=c++17', "-DINSTALLED_CADIBACK"]
+         define_macros_val = [("TRACE", ""), ("INSTALLED_CADIBACK", ""), ("CMS_FULL_VERSION", "\""+version+"\"")]
+ 
++    prefix = os.environ.get('PREFIX', '/usr')
+     modules = Extension(
+         name = "pycryptosat",
+         include_dirs = ["src/", "./"],
+@@ -81,7 +82,6 @@ def gen_modules(version):
+                    "src/gaussian.cpp",
+                    "src/get_clause_query.cpp",
+                    "src/hyperengine.cpp",
+-                   "src/idrup.cpp",
+                    "src/intree.cpp",
+                    "src/lucky.cpp",
+                    "src/matrixfinder.cpp",
+@@ -109,7 +109,9 @@ def gen_modules(version):
+         depends = [
+             "python/cadiback/cadiback.h",
+         ],
+-        libraries = ['/usr/lib/libcadiback.so'], #, 'libgmpxx.so', 'libgmp.so'
++        library_dirs = [os.path.join(prefix, 'lib')],
++        libraries = ['cadiback', 'gmp'],
++        runtime_library_dirs = [os.path.join(prefix, 'lib')],
+         extra_compile_args = extra_compile_args_val,
+         define_macros=define_macros_val,
+         language = "c++",

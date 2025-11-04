@@ -1,0 +1,12 @@
+diff --git a/configure b/configure
+index 9c408d8..944e319 100755
+--- a/configure
++++ b/configure
+@@ -87,6 +87,6 @@ fi
+ msg "Compiling with '$COMPILE'"
+ 
+ rm -f makefile
+-sed -e "s/@COMPILE@/$COMPILE/" makefile.in > makefile
++sed -e "s|@COMPILE@|$COMPILE|" makefile.in > makefile
+ 
+ msg "Generated 'makefile' (run 'make' to compile)"

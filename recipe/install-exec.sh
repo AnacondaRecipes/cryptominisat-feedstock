@@ -1,3 +1,4 @@
+pushd cryptominisat
 mkdir -p build_exec && pushd build_exec
 
 cmake \
