@@ -13,6 +13,7 @@ source:
     patches:
      - patches/fix_source_for_python.patch
      - patches/fix_tests.patch
+     - patches/link_static_libraries.patch
   # We need to use source from git because
   # https://github.com/arminbiere/cadiback/blob/789329d8fcda851085ed72f1b07d8c3f46243b8a/generate#L7
   - git_url: https://github.com/meelgroup/cadiback.git

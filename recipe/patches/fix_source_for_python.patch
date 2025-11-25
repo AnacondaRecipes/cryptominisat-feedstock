@@ -1,16 +1,50 @@
 diff --git a/setup.py b/setup.py
-index d6859b6c5..eacf8a3dd 100644
+index d6859b6c5..c1fd7fdc7 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -56,6 +56,7 @@ def gen_modules(version):
-         extra_compile_args_val = ['-I../', '-Isrc/', '-std=c++17', "-DINSTALLED_CADIBACK"]
-         define_macros_val = [("TRACE", ""), ("INSTALLED_CADIBACK", ""), ("CMS_FULL_VERSION", "\""+version+"\"")]
+@@ -49,12 +49,37 @@ picosatlib = ('picosatlib', {
+ def gen_modules(version):
  
+     if platform == "win32" or platform == "cygwin":
+-        extra_compile_args_val = ['-I../', '-Isrc/', '/std:c++17', "/DINSTALLED_CADIBACK", "/DCMS_FULL_VERSION=\""+version+"\""]
+-        define_macros_val = [("TRACE", ""), ("INSTALLED_CADIBACK", "")]
++        extra_compile_args_val = ['-I../', '-Isrc/', '/std:c++17', "/DCMS_FULL_VERSION=\""+version+"\""]
++        define_macros_val = [("TRACE", "")]
+ 
+     else:
+-        extra_compile_args_val = ['-I../', '-Isrc/', '-std=c++17', "-DINSTALLED_CADIBACK"]
+-        define_macros_val = [("TRACE", ""), ("INSTALLED_CADIBACK", ""), ("CMS_FULL_VERSION", "\""+version+"\"")]
++        extra_compile_args_val = ['-I../', '-Isrc/', '-std=c++17']
++        define_macros_val = [("TRACE", ""), ("CMS_FULL_VERSION", "\""+version+"\"")]
++
 +    prefix = os.environ.get('PREFIX', '/usr')
++
++    cadiback_static = os.path.join('..', 'cadiback', 'libcadiback.a')
++    cadical_static = os.path.join('..', 'cadical', 'build', 'libcadical.a')
++
++    extra_objects_list = []
++    if os.path.exists(cadiback_static):
++        extra_objects_list.append(cadiback_static)
++    if os.path.exists(cadical_static):
++        extra_objects_list.append(cadical_static)
++
++    extra_link_args_val = []
++    if platform == "darwin":
++        if os.path.exists(cadiback_static):
++            extra_link_args_val.append(f'-Wl,-force_load,{cadiback_static}')
++        if os.path.exists(cadical_static):
++            extra_link_args_val.append(f'-Wl,-force_load,{cadical_static}')
++    elif platform == "linux":
++        if extra_objects_list:
++            extra_link_args_val.extend([
++                '-Wl,--whole-archive',
++                *extra_objects_list,
++                '-Wl,--no-whole-archive'
++            ])
+ 
      modules = Extension(
          name = "pycryptosat",
-         include_dirs = ["src/", "./"],
-@@ -81,7 +82,6 @@ def gen_modules(version):
+@@ -81,7 +106,6 @@ def gen_modules(version):
                     "src/gaussian.cpp",
                     "src/get_clause_query.cpp",
                     "src/hyperengine.cpp",
@@ -18,14 +52,17 @@ index d6859b6c5..eacf8a3dd 100644
                     "src/intree.cpp",
                     "src/lucky.cpp",
                     "src/matrixfinder.cpp",
-@@ -109,7 +109,9 @@ def gen_modules(version):
+@@ -109,8 +133,12 @@ def gen_modules(version):
          depends = [
              "python/cadiback/cadiback.h",
          ],
 -        libraries = ['/usr/lib/libcadiback.so'], #, 'libgmpxx.so', 'libgmp.so'
 +        library_dirs = [os.path.join(prefix, 'lib')],
-+        libraries = ['cadiback', 'gmp'],
++        libraries = ['gmp'],
 +        runtime_library_dirs = [os.path.join(prefix, 'lib')],
          extra_compile_args = extra_compile_args_val,
++        extra_link_args = extra_link_args_val,
++        extra_objects = extra_objects_list,
          define_macros=define_macros_val,
          language = "c++",
+     )
