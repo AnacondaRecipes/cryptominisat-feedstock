@@ -11,4 +11,6 @@ cmake \
     -DONLY_SIMPLE=OFF \
     ..
 
-cmake --build . --target install --config RelWithDebInfo
+cmake --build . --target install --config Release --parallel ${CPU_COUNT}
+popd
+popd

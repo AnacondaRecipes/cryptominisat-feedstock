@@ -1,6 +1,5 @@
 {% set name = "cryptominisat" %}
 {% set version = "5.12.1" %}
-{% set build = 0 %}
 
 # in this version of cryptominisat author uses cadiback and cadical from his fork, so we cannot unvendor them
 # There was a decision to build libraries from fork sources but link them staticaly
@@ -58,8 +57,8 @@ outputs:
         - cmake
         - make  # [unix]
       host:
-        - zlib
-        - gmp
+        - zlib {{ zlib }}
+        - gmp {{ gmp }}
       run:
         - zlib
     test:
@@ -79,7 +78,6 @@ outputs:
 
   - name: pycryptosat
     build:
-      number: {{ build }}
       skip: True  # [py<35]
       script:
         - cd cryptominisat && python -m pip install . -vv --no-deps --no-build-isolation
@@ -94,9 +92,9 @@ outputs:
         - tomli
         - wheel
         - pip
-        - gmp
+        - gmp {{ gmp }}
         - {{ pin_subpackage('libcryptominisat', exact=True) }}
-        - zlib
+        - zlib {{ zlib }}
       run:
         - python
         - zlib
@@ -121,7 +119,7 @@ outputs:
       host:
         - libboost-devel 1.88.0
         - {{ pin_subpackage('libcryptominisat', exact=True) }}
-        - zlib
+        - zlib {{ zlib }}
       run:
         - zlib
         - {{ pin_compatible("libboost", max_pin="x.x.x") }}
