@@ -1,5 +1,5 @@
 diff --git a/setup.py b/setup.py
-index d6859b6c5..c1fd7fdc7 100644
+index d6859b6c5..19aa7a633 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -49,12 +49,37 @@ picosatlib = ('picosatlib', {
@@ -25,8 +25,8 @@ index d6859b6c5..c1fd7fdc7 100644
 +    extra_objects_list = []
 +    if os.path.exists(cadiback_static):
 +        extra_objects_list.append(cadiback_static)
-+    if os.path.exists(cadical_static):
-+        extra_objects_list.append(cadical_static)
++    # if os.path.exists(cadical_static):
++    #     extra_objects_list.append(cadical_static)
 +
 +    extra_link_args_val = []
 +    if platform == "darwin":
