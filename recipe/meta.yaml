@@ -65,6 +65,8 @@ outputs:
       commands:
         - test -e $PREFIX/lib/libcryptominisat5.5.12.dylib    # [osx]
         - test -e $PREFIX/lib/libcryptominisat5.so.5.12       # [linux]
+        - test ! -f $PREFIX/lib/libcadical.a || (echo "ERROR: libcadical.a should not be in package" && exit 1)
+        - test ! -f $PREFIX/lib/libcadiback.a || (echo "ERROR: libcadiback.a should not be in package" && exit 1)
         - IF NOT EXIST %LIBRARY_BIN%\cryptominisat5win.dll exit 1       # [win]
         - cryptominisat5 --zero-exit-status <unsat.cnf
         - cryptominisat5 --zero-exit-status <sat.cnf

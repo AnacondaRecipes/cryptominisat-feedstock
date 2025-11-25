@@ -1,4 +1,3 @@
-mkdir -p $PREFIX/lib $PREFIX/include
 pushd cadical
     export LDFLAGS="$LDFLAGS -Wl,-headerpad_max_install_names"
     ./configure
