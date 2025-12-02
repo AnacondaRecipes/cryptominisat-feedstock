@@ -1,0 +1,68 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 167683a1a..5d7569f32 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -50,7 +50,10 @@ if(POLICY CMP0104)
+     cmake_policy(SET CMP0104 NEW)
+ endif()
+ 
+-
++if(POLICY CMP0079)
++    # Allow target_link_libraries() to link to targets in other directories
++    cmake_policy(SET CMP0079 NEW)
++endif()
+ # -----------------------------------------------------------------------------
+ # Provide scripts dir for included cmakes to use
+ # -----------------------------------------------------------------------------
+@@ -534,15 +537,22 @@ if (NOT NOZLIB AND NOT ((NOT BUILD_SHARED_LIBS) AND WIN32))
+ endif()
+ 
+ 
+-find_library(cadiback
+-    PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../cadiback/
+-    NAMES cadiback
+-    REQUIRED)
+-find_library(cadical
++# Force finding static libraries only
++if(NOT BUILD_SHARED_LIBS)
++    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
++endif()
++
++find_library(cadical_static
++    NAMES libcadical.a cadical
+     PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../cadical/build/
+-    NAMES cadical
+-    REQUIRED)
++    REQUIRED
++)
+ 
++find_library(cadiback_static
++    NAMES libcadiback.a cadiback
++    PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../cadiback/
++    REQUIRED
++)
+ 
+ include(CheckFloatPrecision)
+ check_float_precision()
+@@ -656,6 +666,21 @@ message(STATUS "All defines at startup: ${COMPILE_DEFINES}")
+ 
+ add_subdirectory(src cmsat5-src)
+ 
++# Link static libraries with platform-specific options
++if(UNIX AND NOT APPLE)
++    target_link_libraries(cryptominisat5 PRIVATE 
++        -Wl,--whole-archive
++        ${cadical_static} 
++        ${cadiback_static}
++        -Wl,--no-whole-archive
++    )
++elseif(APPLE)
++    target_link_libraries(cryptominisat5 PRIVATE 
++        -Wl,-force_load,${cadical_static}
++        -Wl,-force_load,${cadiback_static}
++    )
++endif()
++
+ # -----------------------------------------------------------------------------
+ # Add uninstall target for makefiles
+ # -----------------------------------------------------------------------------

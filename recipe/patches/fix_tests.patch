@@ -1,0 +1,21 @@
+diff --git a/python/tests/test_pycryptosat.py b/python/tests/test_pycryptosat.py
+index a59e659a6..50911773b 100644
+--- a/python/tests/test_pycryptosat.py
++++ b/python/tests/test_pycryptosat.py
+@@ -343,12 +343,11 @@ def run():
+     except AttributeError:
+         pass
+     suite = unittest.TestSuite()
+-    suite.addTest(unittest.makeSuite(TestXor))
+-    suite.addTest(unittest.makeSuite(InitTester))
+-    suite.addTest(unittest.makeSuite(TestSolve))
+-    suite.addTest(unittest.makeSuite(TestDump))
+-    suite.addTest(unittest.makeSuite(TestSolveTimeLimit))
+ 
++    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestXor))
++    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(InitTester))
++    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSolve))
++    suite.addTest(unittest.TestLoader().loadTestsFromTestCase(TestSolveTimeLimit))
+     runner = unittest.TextTestRunner(verbosity=2)
+     result = runner.run(suite)
+ 

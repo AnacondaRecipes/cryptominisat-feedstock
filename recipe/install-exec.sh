@@ -1,3 +1,4 @@
+pushd cryptominisat
 mkdir -p build_exec && pushd build_exec
 
 cmake \
@@ -10,4 +11,6 @@ cmake \
     -DONLY_SIMPLE=OFF \
     ..
 
-cmake --build . --target install --config RelWithDebInfo
+cmake --build . --target install --config Release --parallel ${CPU_COUNT}
+popd
+popd
