@@ -19,18 +19,19 @@ source:
   # We need to use source from git because
   # https://github.com/arminbiere/cadiback/blob/789329d8fcda851085ed72f1b07d8c3f46243b8a/generate#L7
   - git_url: https://github.com/meelgroup/cadiback.git
-    git_rev: mate
+    # OLD API commit (cryptominisat version update will require update this git_rev as well)
+    git_rev: ea65a9442fc2604ee5f4ffd0f0fdd0bf481d5b42
     folder: cadiback
     patches:
      - patches/fix_cadiback.patch
   # The reason why cadical should be built from source here:
   # https://github.com/arminbiere/cadiback/blob/789329d8fcda851085ed72f1b07d8c3f46243b8a/README.md?plain=1#L7
   - git_url: https://github.com/meelgroup/cadical.git
-    git_rev: mate-only-libraries-1.8.0
+    git_rev: 16dde5487287b349d19eb9f16642a797e38ca34f
     folder: cadical
 
 build:
-  number: 0
+  number: 1
   # After adding cadical and caiback as dependency to this package it cannot be build for windows
   # https://github.com/msoos/cryptominisat/commit/d1a51c9e7a96206bb2ddd07ae524e147b796e4b2
   skip: True  # [win]
