@@ -31,7 +31,7 @@ source:
     folder: cadical
 
 build:
-  number: 1
+  number: 2
   # After adding cadical and caiback as dependency to this package it cannot be build for windows
   # https://github.com/msoos/cryptominisat/commit/d1a51c9e7a96206bb2ddd07ae524e147b796e4b2
   skip: True  # [win]
