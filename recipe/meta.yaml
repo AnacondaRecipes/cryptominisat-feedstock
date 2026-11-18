@@ -39,6 +39,10 @@ build:
 # HACK: there's an issue with conda-build looping over python versions.  Forcing this here gives
 #    us a clean slate for each build.
 requirements:
+  build:
+    # the git_url sources above need git; only the linux build images do not ship it
+    # in the conda-build root env, the osx images do, hence linux-only
+    - git  # [linux]
   host:
     - python
   run:
